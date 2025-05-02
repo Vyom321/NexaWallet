@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NexaWallet - Crypto Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="new.css" />
+  <style>
+    .output-section {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      background: #2c3e50;
+      color: white;
+      font-size: 16px;
+      white-space: pre-line;
+      font-family: monospace;
+    }
+    .output-section.error {
+      background: #c0392b;
+    }
+    .output-section.success {
+      background: #27ae60;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="logo">💼 NexaWallet</div>
+      <button id="logout-btn" class="btn logout" onclick="logout()" style="display: none;">Logout</button>
+    </nav>
+
+    <!-- Authentication -->
+    <section id="auth-section" class="card auth">
+      <h2>🔐 Access NexaWallet</h2>
+      <input type="text" id="username" placeholder="Username" />
+      <input type="password" id="password" placeholder="Password" />
+      <div class="button-group">
+        <button class="btn primary" onclick="register()">Register</button>
+        <button class="btn secondary" onclick="login()">Login</button>
+      </div>
+    </section>
+
+    <!-- Dashboard -->
+    <section id="dashboard" class="dashboard" style="display: none;">
+      <div class="dashboard-grid">
+
+        <div class="card action" onclick="getBalance()">
+          <img class="icon-img" src="https://img.icons8.com/dusk/64/000000/money.png" alt="balance">
+          <h3>Check Balance</h3>
+        </div>
+
+        <div class="card action" onclick="addBalance()">
+          <img class="icon-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANgAAADpCAMAAABx2AnXAAAAgVBMVEX///8AAADZ2dnExMQuLi7t7e1mZmaCgoLf39/7+/uUlJRJSUnx8fFERES4uLjj4+PNzc2bm5uJiYkjIyN8fHzi4uL29vaurq6pqamhoaFdXV3T09M1NTU6OjqQkJAWFhZhYWFVVVUMDAweHh6+vr5zc3MiIiJ1dXURERFQUFA/Pz96jboPAAAKVUlEQVR4nO2de1vqMAzGEUQucgQBQZiI4O3o9/+AR/TYpl3aJlu3Znt4/2Ub+W29pGnadjoVatTvbebLw8Nif3H8+7b7eJ+vZ5Mq/7AOjWaPfy4wLa7up6mNK6zJ+gOFUlr2UptYRDfXfqofDYap7eRpMqdQfeu6QZ+tvyRjnfS2Tm0wTaMBC+ukfRO+2pqNddK19DZy+um0/Xj5+bBwow1Sm+7VLWbybr7OwAcZ9m5fn5HLnuU2kKtDHmqcrbBL++urPNqmboOJ6tqG7sfemtN7sm+4qstUll4sKwkd1GRs3XMp0Im0qtduVui2C3Gt46Nh3oLeMa2sbk9YE2Jad8u6987sIroVmVhIhmu463Nv3xhkd1VYWEyGYfMCD5hewiewX0xV6kGrCrp9sFvbj+LaV1TTKHUftj7XMc0rrBHwj95KlKL7ksU5urbanmfUfaIKjgsEjGPAiz6W9BvgNyv1imIIVrDSrRnwsLYxjCsjELKJ0LO+6qe9lH9aGd1oS27cV/VnX8qybnc4nE69hexBl+vYprI00lxL91V2tMAz7poIaRl153PpuSoXDPZUxhfSVVVrpa3wdcy5OIivMdcuSMJhp/bpveUm98U81RG+rGRjM1AhvNexwECN9FTbajWmWcoEAy1jql5aGeBrOTpsMD1Y4A1Yo0k3YIHOlAnW2f1et4hnLEeH3//fBy7kguk3RowIxZVuOu4DV3LBOmog9BrLWI506xWq42ww3SrFMpYjVRKDr5UNpgtDgrI4ov85G0zfkcBhnHmLywgIA4M/I1JDzkBHUoVUPcBcunsbxaMFMu7Ww9f6g/kq1QGbQd4zwNBuWMUZ6w9+KLuQ0cUIBXAJq0fvPupKpQsL8mN5MNWX1D52UQ7dE/JjebDh748P1WLkpcL1Y+TH0ZED9og9Qf1aNYgtNb+C9kl/y4LpKlx3s6jivxn2K6tVRMFUWK/u6TLV6aIhFyzdwSmsMHdU1lLd7b0a5qJFpTyYCqcE3a/IUjk2qGvvycAhginHpu4Msrd4YGgfrFrdurNaVGFDwS5xBAaY6qHR71mh/EWRBYZ+E+VGV+RTTXubzXiASPVUaOOxwxFwobVIFcWP3F+PN/ezUuHv7hjPwDaF/gUrxRSNjtvJSDltN8Xg+nOi94DGoZE8OKfwskZJU324Z6cXDHOJaU65OlDqCNpxO5L1h2nOQlu9hp8IjAyKH/NgND+h2B8QL6uXEG4pAkY34JM4KTPahp8FRZgFLwA2xf7KJVIf3mc55idVAmZndfpFCBjfcbEoM6oFwOgrLb71J/Q8VgkgW1kAzJ3ljmvnf9wk/IS83isA4xvizyvDnPLPq3fMpRrojqYCMJU+8nee/+fX7YP9wAt/OCvfKw9mzg5Qh1vQ4EA5MGWJYxp61ct3te62cWNdeen//0Pgz7XYYPqluQMDo9yqDFd0pE9+Az/S8fnAhbw8j5O0i+DzmOxlT66J3YNxVThjWb+I0AfIrf0L+Qpq1PPkvy4zH4u70zPjmkPgr09SJSw013NzQTEAszeUAjcxo0bo2NCoCBQuUGBCU3/9U+7b/+S3frhD12Un6LuvjMEVtlTL+Kq0gLmu4nGTk/XiH0JqjtkyIHEKY/xDDCvrcXLUqKZeZExZWmBUoXyDZ3T11ORO7YA9syz3SyfmkCqEMdbO13Y4Bvsg26B79IjRP+3+BHv+H8FvkuvLDr4fnQI+c7SsSZ3bSX3BcMLbjkLCmTpOS3BV6C6fwLJB8gsGxtvjF7gKkTMLANqkSIFN3THRJ2lhsM/6CXahrCRBsCKFWCP8Ao0zfcYPNozWZwb2MSd9F0UscQr44ZzmCIBZLfq7/sW90DoLhHkW/ZKa2L6X43+2r5ue0VgBL9uqEWDjDeeb4mTb1KDLgXbkQAG25n3BkNTlRPTyz06uwf9hAuijrUAFiLu6wFgzQ7Vp+z2jAZqIK6fVDrAi8atadLUypmbYYFn+kVL0UgpM7Bf70qAMGC/ZJp34YMV2VqldfDDe9GsyFQDr3LDybRKpCNiXMz8k6u5XU1x+z8qn/l022yzdnWoxMDma3GPx+xaAfSlDd5ZrARg+7dkKsE4/X9faAYbMd7QFLJek2xow24dtDZg9sG8PmJVC2CKwblvBOtu2gs3aCqYzytsGdttWsH5bwWC8t11g87aClQq/SdYZrGlqLdhtE8FWWW+9GXt1e9DmW0kvQsGy8ZadLX9xgGkPEsG6A9ZqaiiNJg9s7QiI0qTSSKWBlZ/I/591Igsse3MbTNZPToEoMObyD5e+MwoEgU1ZS409epYFxluG5NVcEpi9qKGUJnLA0DMpCmsuBixyutZRChgt+Y2hTAbY0G1hQW1EgPE22iFpKQKMuKSbow8JYBE7MKWdALAKCuJp4UR6sEe3eY0GW7mtazZYJI9eHFhos7jjn/f58pod/0gP5k+GXP4uf5gyP2x6MN8eNgNjTQoLLTmYvVIZyl7/2WX0C8nBPF59fjXjhD7ETg7m3qEH2wGJ3jUkB3OWLnxDnJnrcmlgzpz+T8cNVH85NZjT/3XZQh25pQZzRnCcd5BOLk4P5to1zL1GjxgcSQ3mqjLuhea5Iztlgrlae/d6YeJGxKnBXGs/PYvGz2AiwVpbFBvfeLhaxcY3987dL513oMta5IE5PQ+XLdQFo6nBnJMRrk34qDt2pgZzfwB8v+rGDFs8jTc20KRv5ZcazOes5zvpVYNCA74ZWnv/kyFjQXZyMO/A0dzIIrjjsyiwwMb/t7+b4N2xsCSAhQx+3s4fBx/sTKT0YL6IaQmlB6tinlYGWPyMASFgnmBww8EqqWUSwHgdFFGfEsA6MdJKLW1FgBGH+xwNRIBVsFXZjQyw+JvX9IWAOcNVBbWTkq9IDtIQtZYD1jlE5Dp2BIHBnR7L6kUUWLw87u/jSQSBdbpxtr/aj6SBRUrx+4kCyQLrTEv7+vv/0S1hYKxTpzAdfveTFwd2OiesOJfkFX8nZY9FNk7dwbi4TLAvTbL1+OrjOiBg/rW5DbNYMJoauQ6aotauXD+DNU1nsKbpDNY0ncGapjNY03QGa5rOYE2TGwzsvEM9VU2SQHjEOmgYZGnhmXSy5T4BCaRZEE7kFqeDNt86WQ1k5RJO5BYnbb294gzOkqaxrYxg9ouVBThz/9QAwQka61g4mI0aPrhamkBndbR/e3BDixcsbrmzUmGg/BG7W7DgxHXOvTCyR6KdiVmLjBPf8qf2wtTouGfqVi241hg5tddIi4l0JmYtMibSkDR9M6mfc0hoWhmzaOghsGZaXVM8RtNqvAs2LmlI02hmhTgOgbXWj1/LbxuH1j6nLovt+exN8MTzpOrbyXLO6pPfTmKOLQaSoVluDZlnWIIdKfk6fpl1ZSnrbZCVcUdf+WrIAYWo/IUr7o6UdcreWsdW1D1Ea1SIq6mlkXI8O2d7JCH6Qzs7fFXJMpMKRXeSom+SWqUeKMVQqYqFJpXojTsOGW2acJrwZ6HhVeY5OFWCPsfTMIRDk974dbeQ9u32u6flZkaKpf0D2u2XMQb+ZBAAAAAASUVORK5CYII=" alt="add">
+          <h3>Add Balance</h3>
+        </div>
+
+        <div class="card action" onclick="sendCrypto()">
+          <img class="icon-img" src="https://img.icons8.com/dusk/64/000000/send.png" alt="send">
+          <h3>Send Crypto</h3>
+        </div>
+
+        <div class="card action" onclick="viewTransactions()">
+          <img class="icon-img" src="https://img.icons8.com/dusk/64/000000/transaction-list.png" alt="transactions">
+          <h3>Transactions</h3>
+        </div>
+
+        <div class="card action" onclick="getCryptoPrice()">
+          <img class="icon-img" src="https://img.icons8.com/dusk/64/000000/line-chart.png" alt="price">
+          <h3>Crypto Price</h3>
+        </div>
+
+        <div class="card action" onclick="plotPriceChart()">
+          <img class="icon-img" src="https://img.icons8.com/dusk/64/000000/combo-chart.png" alt="chart">
+          <h3>Price Chart</h3>
+        </div>
+
+        <div class="card action" onclick="askNexaBot()">
+          <img class="icon-img" src="data:image/jpeg;base64,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" alt="bot">
+          <h3>Ask NexaBot</h3>
+        </div>
+
+        <div class="card action" onclick="changePassword()">
+          <img class="icon-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAe1BMVEX///8AAAAwMDCWlpZ0dHS7u7vV1dWurq5WVlaOjo5gYGDS0tKysrKFhYXPz8+KiorHx8fo6OhaWlogICBpaWn19fVCQkKnp6ecnJxvb2+3t7fi4uLAwMBkZGQ2Njbu7u4QEBAZGRl+fn49PT1PT08eHh4mJiYxMTFJSUkaPnUZAAAFfElEQVR4nO2d60LqMAyANwVhCIhyBxVRj/r+T3gY4jm023oJTdrMfL9tyWebph1jyzJBEARBEARBEARBEARBEARBEIQWc9NdzWbvi69Ff7ZePm5jhxOWeXf0kutMi8k8dmBh2PX6FbsfBl3+kuNZo96RfecmdogXMVmY/Y488HW8fXPwK3nnue7MO45+JQXDfNxUV08TH5PYAfviM4DfXMcO2Yv7Z2/Bw4qzix22O7cAvwMf97EDd2UCEzzAZE3tggXz/DZ28C7AR7CEQfW/aQx+PyuWkwOPy+KpuZQkv9zcNwTeH6rLyLb3Vf+H09Rrf22ZmK7qRmZb7Ov++Ik8Zi9ea0L+02salvmqTnFFGrEndcvoyDTtdnWHq4RXm3nNSd4Wbs3SOyUJFkR1jg7s68auuuQkO0+rheLVqd1TpV2q27fKgffOseFab7hGjRNMJaPcRrDkQW+a5gZVD/PBo61eRt3/OYRUjkw+jbd64xQ3b/qp3q+qbbTWCZ7451qII8/22hzfowR5Edog7H030PqWHXBSHOKuT9qle/+irc1y/7VmmH+gZq8a34t/Bzu1hyvf9j3kBUorhpCFQhtEzyl3FMS8mFWo4UE+aKx20fNq3PsZejRFtWS/B+jDa+c2/NdsijRRtXPTEtTJSOnjzaNl76zdC46idqyALdtaLrvXm57SDicX1RwCXk3SSqJzoKpgjlM0lspHDIC9TJVeHh1bDXMdjImqphD0ZPCu9OKYzPoIHidR+Imq1jLoVYhXQC91ghhFQ71kNgT2cq304rRrqE7Rb4Ln4kDp3jWDdNRsLhxa1I/gkcCK6tkH+g2SGq+DoUEw9LUe9WQBvaTra2gS7ANjaCKKYVMOlvhcJHIihqFpBKEVuZkIhrSCEQxNUzR0DpaQG5oEEUaQ3pB4imbkhibB4KvoN7SG1DlYQmpIP0UzWsMogpSGlFu1M+gMSbdqZ5AZxpmiGZ1hhDJxgsgwRpk4QWMYbYpmRIYxBUkM4+VgiXpfE/Q6jXolSrsbJ1aZODHpnrGBXubabs57UWdC1ClKwa8WRC4TNJCf6Kn51VOUYBXFJ+JWLdt2l9fhKVIpE+PXqeGzL0C9Iy6a4LZ663Ig1K1MtDKh3ywZDnUEo23Vrg0fHFIw2hRdGj74MtynKKrg2PDBl+E+RXHLBORHvoEFccuE6ZMvIpEpmmX76ILIW7XKDwcCkUoOZlntbwZDC0Y9TVR+pBSEZHIw02+vIxckONF/IggmslU7cRVeMKUpimKYTJnAMkynTCAZJlQmcAwTy8HwhqnlYHDDtMoEgmF6ORjYMMEcDGvoPoK0X74EM0zlRI9mmOgUDWeYYpkIagjdqlE8iSCIIbRMjCmeCRLCEJqD47zDwxB6or/NmRhCt2rls0VYGIJzMGdiCM3B76fDMDCElonT428YGCq/vnTfqv1838XAsHvWlWcO8jN036r9f0ITK0PvHORmCJiivAx9ywQ7w0fDnzROUVaGhvtVmhaZ1hg252BLDA052A5DUw62wtA8RVtgaBXkbmhcRdtg6CDI29A+RZkbWsoEf0NbmWBvqOZg8x2sbA2dcpCX4WbdOUN9wJvpNTV8DA0Y38PTBkPzXeQtMLTcJs/f0PaqKPaG1ndhcTe0/5KDgeHqphnT5Sk+hhcihmIohmIohmIohmIohmIohmIohmIohmIohr/HcNF6w4E9DER8XxwJ4S6qIcXLkGteM00IyWt0Ywo+UwhWXhpLCc0rZnf2QNCAvbLOm8IeCRKw9yoC6NtjQeGJSjCbIz0T0sKCTPCg+GWPJzh0I3hkZI8oMORv6t7S7t46MV62Pt+sF59X+Hx+dey3GQmCIAiCIAiCIAiCIAiCIAiCIDDlL8A6YCcR858IAAAAAElFTkSuQmCC" alt="change password">
+          <h3>Change Password</h3>
+        </div>
+
+      </div>
+
+      <div id="output" class="output-section"></div>
+      <canvas id="chart" style="max-width: 100%; display: none;"></canvas>
+
+      <div class="footer">
+        Built with ❤️ for crypto lovers | NexaWallet 2025
+      </div>
+    </section>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="ft.js"></script>
+
+</body>
+</html>
